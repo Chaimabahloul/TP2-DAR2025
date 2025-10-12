@@ -17,7 +17,7 @@ public class Client {
             System.out.print("Entrez une opération (ex: 55 * 25) : ");
             String input = sc.nextLine().trim();
 
-            // ✅ Validation syntaxe
+            //  Validation syntaxe
             if (!input.matches("\\d+\\s*[+\\-*/]\\s*\\d+")) {
                 System.out.println(" Erreur : format invalide !");
                 sc.close();
@@ -40,7 +40,7 @@ public class Client {
             String resultat = in.readLine();
             System.out.println("le resultat " + resultat);
 
-            // ✅ Fermeture des ressources
+            //  Fermeture des ressources
             sc.close();
             in.close();
             out.close();

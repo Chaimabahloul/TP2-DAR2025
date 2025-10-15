@@ -1,57 +1,63 @@
 package serverpackage;
 import java.io.*;
 import java.net.*;
-
 public class Server {
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		try {
-            ServerSocket serveur = new ServerSocket(1234);
-            System.out.println("Serveur prêt, en attente d’un client...");
+    public static void main(String[] args) throws Exception {
+        ServerSocket serverSocket = new ServerSocket(1234);
+        System.out.println("Serveur en attente de connexion...");
 
-            Socket socket = serveur.accept();
-            System.out.println("Client connecté.");
+        Socket socket = serverSocket.accept();
+        System.out.println("Client connecté !");
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+        
+        BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        PrintWriter pw = new PrintWriter(socket.getOutputStream(), true);
 
-            // Lecture des éléments
-            String op1 = in.readLine();
-            String operateur = in.readLine();
-            String op2 = in.readLine();
+        String operation;
 
-            double resultat = 0;
-            double a = Double.parseDouble(op1);
-            double b = Double.parseDouble(op2);
+        
+        while ((operation = br.readLine()) != null) {
+            System.out.println("Opération reçue : " + operation);
 
-            switch (operateur) {
-                case "+": resultat = a + b; break;
-                case "-": resultat = a - b; break;
-                case "*": resultat = a * b; break;
-                case "/": 
-                    if (b == 0) {
-                        out.println("Erreur : division par zéro !");
-                        socket.close();
-                        serveur.close();
-                        return;
-                    }
-                    resultat = a / b; 
-                    break;
-                default:
-                    out.println("Erreur : opérateur inconnu !");
-                    socket.close();
-                    serveur.close();
-                    return;
+           
+            String[] parts = operation.split(" ");
+            if (parts.length != 3) {
+                pw.println("Erreur : syntaxe incorrecte");
+                continue;
             }
 
-            out.println("Résultat = " + resultat);
-            socket.close();
-            serveur.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+            try {
+                int op1 = Integer.parseInt(parts[0]);
+                String operator = parts[1];
+                int op2 = Integer.parseInt(parts[2]);
+                int result = 0;
+
+                // Calcul selon l'opérateur
+                switch (operator) {
+                    case "+": result = op1 + op2; break;
+                    case "-": result = op1 - op2; break;
+                    case "*": result = op1 * op2; break;
+                    case "/": 
+                        if (op2 != 0) result = op1 / op2;
+                        else pw.println("Erreur : division par zéro"); 
+                        continue;
+                    default: pw.println("Erreur : opérateur inconnu"); continue;
+                }
+
+               
+                pw.println(result);
+
+            } catch (NumberFormatException e) {
+                pw.println("Erreur : opérandes non valides");
+            }
         }
 
-	}
-
+        
+        br.close();
+        pw.close();
+        socket.close();
+        serverSocket.close();
+    }
 }
+

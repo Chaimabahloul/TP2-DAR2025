@@ -2,59 +2,38 @@ package serverpackage;
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
-
 public class Client {
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-        try {
-            Socket socket = new Socket("localhost", 1234);
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+    public static void main(String[] args) throws Exception {
+        Socket socket = new Socket("localhost", 1234);
+        System.out.println("Connecté au serveur !");
 
-            Scanner sc = new Scanner(System.in);
+        BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        PrintWriter pw = new PrintWriter(socket.getOutputStream(), true);
 
-            System.out.print("Entrez une opération (ex: 55 * 25) : ");
-            String input = sc.nextLine().trim();
+        Scanner sc = new Scanner(System.in);
+        String operation;
 
-            //  Validation syntaxe
-            if (!input.matches("\\d+\\s*[+\\-*/]\\s*\\d+")) {
-                System.out.println(" Erreur : format invalide !");
-                sc.close();
-                socket.close();
-                return;
-            }
+        // Boucle pour envoyer plusieurs opérations
+        while (true) {
+            System.out.println("Entrez l'opération (Ex: 55 * 25) ou 'exit' pour quitter :");
+            operation = sc.nextLine();
 
-            // Séparer les éléments
-            String[] elements = input.split("\\s*([+\\-*/])\\s*");
-            String op1 = elements[0];
-            String op2 = elements[1];
-            String operateur = input.replaceAll("[0-9\\s]", ""); // extrait le symbole
+            if (operation.equalsIgnoreCase("exit")) break;
 
-            // Envoi au serveur
-            out.println(op1);
-            out.println(operateur);
-            out.println(op2);
+            // Envoyer opération au serveur
+            pw.println(operation);
 
-            // Lecture du résultat
-            String resultat = in.readLine();
-            System.out.println("le resultat " + resultat);
-
-            //  Fermeture des ressources
-            sc.close();
-            in.close();
-            out.close();
-            socket.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
+            // Lire résultat du serveur
+            String resultat = br.readLine();
+            System.out.println("Résultat reçu : " + resultat);
         }
+
+        // Fermeture des flux et socket
+        sc.close();
+        br.close();
+        pw.close();
+        socket.close();
     }
-
-       
-        
-
-
-	}
-
+}
 
